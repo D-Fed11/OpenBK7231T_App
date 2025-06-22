@@ -56,7 +56,6 @@ void MQTT_BroadcastTasmotaTeleSENSOR();
 #define PUBLISHITEM_SELF_DYNAMIC_LIGHTSTATE     -3
 #define PUBLISHITEM_SELF_DYNAMIC_LIGHTMODE      -2
 #define PUBLISHITEM_SELF_DYNAMIC_DIMMER         -1
-#define PUBLISHITEM_SHUTTER_STATE				-18
 
 
 enum OBK_Publish_Result_e {

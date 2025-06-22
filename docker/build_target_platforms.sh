@@ -1,23 +1,22 @@
 #!/bin/bash
 
-# Set default app version if not provided
+$(shell date +%Y%m%d_%H%M%S)
 app_ver=${APP_VERSION:-"dev_$(date +%Y%m%d_%H%M%S)"}
 
-if [ -z "${TARGET_SDKS}" ]; then
-    declare -a target_platforms=(
-        "OpenBK7231T"
-        "OpenBK7231N"
-        "OpenXR809"
-        "OpenBL602"
-        "OpenW800"
-        "OpenW600"
-        "OpenLN882H"
-    )
-else
-    # Convert comma-separated string to array
-    IFS=',' read -r -a target_platforms <<< "${TARGET_SDKS}"
-fi
 
+if [ ! -v TARGET_SDKS ]; then
+    declare -a target_platforms=(
+            "OpenBK7231T"
+            "OpenBK7231N"
+            "OpenXR809"
+            "OpenBL602"
+            "OpenW800"
+            "OpenW600"
+            "OpenLN882H"
+        )
+else
+    target_platforms=(${TARGET_SDKS//,/ })
+fi
 echo "****************************************"
 echo "****************************************"
 echo ""
@@ -26,14 +25,13 @@ echo "Building OpenBeken with version \"${app_ver}\""
 echo ""
 
 cd /OpenBK7231T_App
-
-# silence any git ownership warnings because this is being
+# silence any git ownership warnings beause this is being
 # done through a docker. Better solution would be to
 # pass through the git config of the host system
 git config --global --add safe.directory /OpenBK7231T_App
 
 # build the targeted SDKs
-for sdk in "${target_platforms[@]}"; do
+for sdk in ${target_platforms[@]}; do
     echo ""
     echo "****************************************"
     echo "Building platform: ${sdk}"
@@ -43,7 +41,7 @@ for sdk in "${target_platforms[@]}"; do
     # build process will be confused by the prior SDKs build of the
     # shared app code.
     make clean
-    make APP_VERSION="${app_ver}" APP_NAME="${sdk}" "${sdk}"
+    make APP_VERSION=${app_ver} APP_NAME=${sdk} ${sdk}
 done
 
 echo "****************************************"

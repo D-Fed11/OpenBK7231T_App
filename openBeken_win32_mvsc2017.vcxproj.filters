@@ -399,7 +399,6 @@
     <ClCompile Include="src\driver\drv_tclAC.c" />
     <ClCompile Include="src\selftest\selftest_pir.c" />
     <ClCompile Include="src\selftest\selftest_tclAC.c" />
-    <ClCompile Include="src\driver\drv_shutter.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\base64\base64.h" />
@@ -608,7 +607,6 @@
     <ClInclude Include="libraries\berry\generate\be_fixed_sys.h" />
     <ClInclude Include="libraries\berry\generate\be_fixed_time.h" />
     <ClInclude Include="libraries\berry\generate\be_fixed_undefined.h" />
-    <ClInclude Include="src\driver\drv_shutter.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="..\..\platforms\bk7231t\bk7231t_os\beken378\func\include\net_param_pub.h" />

@@ -13,7 +13,6 @@
 #include "drv_tuyaMCU.h"
 #include "drv_uart.h"
 #include "drv_ds1820_simple.h"
-#include "drv_shutter.h"
 
 
 typedef struct driver_s {
@@ -463,13 +462,6 @@ static driver_t g_drivers[] = {
 	//drvdetail:"descr":"Driver for 7-segment LED display with I2C-like interface. Seems to be compatible with TM1650. HD2015 is very similiar to GN6932 and TM1637. See [this topic](https://www.elektroda.com/rtvforum/topic4052946.html) for details.",
 	//drvdetail:"requires":""}
 	{ "HD2015",	HD2015_Init,		NULL,		NULL, TMGN_RunQuickTick,NULL,  NULL, NULL, false },
-#endif
-#if ENABLE_DRIVER_SHUTTER
-		//drvdetail:{"name":"Shutter",
-		//drvdetail:"title":"TODO",
-		//drvdetail:"descr":"A driver for shutters",
-		//drvdetail:"requires":""}
-	{ "shutter", DRV_Shutter_Init, Shutter_OnEverySecond, Shutter_AppendInformationToHTTPIndexPage, NULL, NULL, NULL, Shutter_DoDiscovery, false },
 #endif
 #if ENABLE_DRIVER_BATTERY
 	//drvdetail:{"name":"Battery",
