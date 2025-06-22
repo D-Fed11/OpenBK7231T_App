@@ -96,9 +96,10 @@ typedef enum {
 	/// @brief Battery level sensor in perc, under channel topic
 	BATTERY_CHANNEL_SENSOR,
 	HASS_HVAC,
+	HASS_COVER,
 	HASS_FAN,
 	HASS_SELECT,
-	HASS_PERCENT,
+	HASS_PERCENT,	
 } ENTITY_TYPE;
 
 //unique_id is defined in hass_populate_unique_id and is based on CFG_GetDeviceName() whose size is CGF_DEVICE_NAME_SIZE.
@@ -131,7 +132,8 @@ HassDeviceInfo* hass_init_energy_sensor_device_info(int index, int asensdataseti
 HassDeviceInfo* hass_init_light_singleColor_onChannels(int toggle, int dimmer, int brightness_scale);
 HassDeviceInfo* hass_init_binary_sensor_device_info(int index, bool bInverse);
 HassDeviceInfo* hass_init_sensor_device_info(ENTITY_TYPE type, int channel, int decPlaces, int decOffset, int divider);
-HassDeviceInfo* hass_createHVAC(float min, float max, float step, const char **fanOptions, int numFanOptions); 
+HassDeviceInfo* hass_createHVAC(float min, float max, float step, const char **fanOptions, int numFanOptions);
+HassDeviceInfo* hass_createCover(int index, const char* title);
 HassDeviceInfo* hass_createFanWithModes(const char *label, const char *stateTopic,
 	const char *command, const char **options, int numOptions);
 HassDeviceInfo* hass_createSelectEntity(const char* state_topic, const char* command_topic, int numoptions,
