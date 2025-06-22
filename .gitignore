@@ -37,3 +37,7 @@ configMemory.bin
 enc_temp_folder/**
 
 *.su
+/examples
+/sdk/OpenBK7231T
+/sdk/OpenBL602
+/sdk/OpenECR6600
