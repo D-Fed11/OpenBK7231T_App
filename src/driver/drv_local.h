@@ -195,6 +195,11 @@ void TCL_UART_RunEverySecond(void);
 void TCL_AppendInformationToHTTPIndexPage(http_request_t *request, int bPreState);
 void TCL_DoDiscovery(const char *topic);
 
+void Shutter_Init(void);
+void Shutter_OnEverySecond(void);
+void Shutter_AppendInformationToHTTPIndexPage(http_request_t* request, int bPreState);
+void Shutter_DoDiscovery(const char* topic);
+
 #define SM2135_DELAY 4
 
 // Software I2C

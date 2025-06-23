@@ -55,6 +55,9 @@ void hass_populate_unique_id(ENTITY_TYPE type, int index, char* uniq_id, int ase
 	case HASS_HVAC:
 		sprintf(uniq_id, "%s_thermostat", longDeviceName);
 		break;
+	case HASS_COVER:
+		sprintf(uniq_id, "%s_shutter_%d", longDeviceName, index);
+		break;
 	case RELAY:
 		sprintf(uniq_id, "%s_%s_%d", longDeviceName, "relay", index);
 		break;
@@ -410,6 +413,73 @@ HassDeviceInfo* hass_createHVAC(float min, float max, float step, const char **f
 
 	return info;
 }
+
+HassDeviceInfo* hass_createCover(int index, const char* title) {
+	HassDeviceInfo* info = hass_init_device_info(HASS_COVER, index, NULL, NULL, 0, title);
+	if (info == NULL) {
+		addLogAdv(LOG_ERROR, LOG_FEATURE_HASS, "Failed to initialize HassDeviceInfo for cover");
+		return NULL;
+	}
+
+	// Generate the numerical object_id for topic construction (used for unique_id)
+	char numeric_object_id[16];
+	sprintf(numeric_object_id, "%d", index);
+
+	const char* clientId = CFG_GetMQTTClientId(); // Get client ID once
+
+	// --- Standard State Topics ---
+	// Home Assistant will subscribe to these to get the cover's state and position.
+	sprintf(g_hassBuffer, "%s/shutter%d/state/get", clientId, index);
+	cJSON_AddStringToObject(info->root, "stat_t", g_hassBuffer);
+
+	sprintf(g_hassBuffer, "%s/shutter%d/position/get", clientId, index);
+	cJSON_AddStringToObject(info->root, "pos_t", g_hassBuffer);
+
+	// --- Home Assistant Command Topics and Payloads (Standard MQTT Cover Compliant) ---
+
+	// 1. Unified Command Topic for Open/Close/Stop actions:
+	// Home Assistant will publish to this topic, with payloads that `CMD_ShutterState_Handler` will parse.
+	sprintf(g_hassBuffer, "cmnd/%s/shutterstate%d", clientId, index);
+	cJSON_AddStringToObject(info->root, "cmd_t", g_hassBuffer);
+
+	// Payloads for Open/Close/Stop actions: These will be simple string representations of the enum values.
+	// Home Assistant receives these string payloads and publishes them to the cmd_t.
+	cJSON_AddStringToObject(info->root, "pl_open", "1");
+	cJSON_AddStringToObject(info->root, "pl_cls", "0");
+	cJSON_AddStringToObject(info->root, "pl_stop", "2");
+
+	// 2. Command Topic for setting position:
+	// Home Assistant will publish the numeric position (e.g., "50") as payload to this topic.
+	sprintf(g_hassBuffer, "cmnd/%s/ShutterPosition%d", clientId, index);
+	cJSON_AddStringToObject(info->root, "set_pos_t", g_hassBuffer);
+
+	// States for HA UI (these are the *payloads* for `stat_t`)
+	cJSON_AddStringToObject(info->root, "stat_t_op", "opening");
+	cJSON_AddStringToObject(info->root, "stat_t_cl", "closing");
+	cJSON_AddStringToObject(info->root, "stat_t_open", "open");
+	cJSON_AddStringToObject(info->root, "stat_t_stopped", "stopped");
+	cJSON_AddStringToObject(info->root, "stat_t_closed", "closed");
+
+	// Value templates to parse individual state topics
+	// For overall OPEN/CLOSED/OPENING/CLOSING string state (comes from shutterX/state/get)
+	cJSON_AddStringToObject(info->root, "val_tpl", "{{ value }}");
+	// For numeric position (comes from shutterX/position/get)
+	cJSON_AddStringToObject(info->root, "pos_tpl", "{{ value | int }}");
+
+	// Device Class
+	cJSON_AddStringToObject(info->root, "dev_cla", "shutter");
+
+	// Availability topic
+	cJSON_AddStringToObject(info->root, "avty_t", "~/connected");
+	cJSON_AddStringToObject(info->root, "pl_av", "online");
+	cJSON_AddStringToObject(info->root, "pl_na", "offline");
+
+	// QoS (unchanged)
+	cJSON_AddNumberToObject(info->root, "qos", 1);
+
+	return info;
+}
+
 /// @brief Initializes HomeAssistant device discovery storage with common values.
 /// @param type 
 /// @param index This is used to generate generate unique_id and name. 
@@ -528,6 +598,9 @@ HassDeviceInfo* hass_init_device_info(ENTITY_TYPE type, int index, const char* p
 		case ENERGY_SENSOR:
 			isSensor = true;
 			sprintf(g_hassBuffer, "Energy");
+			break;
+		case HASS_COVER:
+			sprintf(g_hassBuffer, "Shutter %i", index);
 			break;
 		case TIMESTAMP_SENSOR:
 			sprintf(g_hassBuffer, "Timestamp");
